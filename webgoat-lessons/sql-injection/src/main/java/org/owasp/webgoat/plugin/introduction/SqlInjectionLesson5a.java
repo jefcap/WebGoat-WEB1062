@@ -59,12 +59,21 @@ public class SqlInjectionLesson5a extends AssignmentEndpoint {
     protected AttackResult injectableQuery(String accountName) {
         try {
             Connection connection = DatabaseUtilities.getConnection(getWebSession());
-            String query = "SELECT * FROM user_data WHERE last_name = '" + accountName + "'";
+            //Fix SQL Injection using Prepared Statement
+            //ref: https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md
+
+//            String query = "SELECT * FROM user_data WHERE last_name = '" + accountName + "'";
+            final String query = "SELECT * FROM user_data WHERE last_name = ? ";
 
             try {
-                Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+//                Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+//                        ResultSet.CONCUR_READ_ONLY);
+//                ResultSet results = statement.executeQuery(query);
+
+                PreparedStatement statement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
                         ResultSet.CONCUR_READ_ONLY);
-                ResultSet results = statement.executeQuery(query);
+                statement.setString(1, accountName);
+                ResultSet results = statement.executeQuery();
 
                 if ((results != null) && (results.first())) {
                     ResultSetMetaData resultsMetaData = results.getMetaData();
