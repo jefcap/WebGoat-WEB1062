@@ -61,12 +61,16 @@ public class Comments {
 
     protected Comment parseXml(String xml) throws Exception {
         JAXBContext jc = JAXBContext.newInstance(Comment.class);
+        System.out.println("Check if this function is in use! ");
 
         XMLInputFactory xif = XMLInputFactory.newFactory();
-        xif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
-        xif.setProperty(XMLInputFactory.IS_VALIDATING, false);
+        xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 
-        xif.setProperty(XMLInputFactory.SUPPORT_DTD, true);
+        //When DTD is disabled (false), those line below are not necessary anymore
+//        xif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
+//        xif.setProperty(XMLInputFactory.IS_VALIDATING, false);
+
+
         XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
 
         Unmarshaller unmarshaller = jc.createUnmarshaller();
