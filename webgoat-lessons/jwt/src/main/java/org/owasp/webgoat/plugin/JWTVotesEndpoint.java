@@ -1,10 +1,7 @@
 package org.owasp.webgoat.plugin;
 
 import com.google.common.collect.Maps;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.TextCodec;
 import org.apache.commons.lang3.StringUtils;
 import org.owasp.webgoat.assignments.AssignmentEndpoint;
@@ -139,7 +136,8 @@ public class JWTVotesEndpoint extends AssignmentEndpoint {
             return trackProgress(failed().feedback("jwt-invalid-token").build());
         } else {
             try {
-                Jwt jwt = Jwts.parser().setSigningKey(JWT_PASSWORD).parse(accessToken);
+//                reference: https://stormpath.com/blog/beginners-guide-jwts-in-java , section 'Validating'
+                Jwt jwt = Jwts.parser().setSigningKey(JWT_PASSWORD).parseClaimsJws(accessToken);
                 Claims claims = (Claims) jwt.getBody();
                 boolean isAdmin = Boolean.valueOf((String) claims.get("admin"));
                 if (!isAdmin) {
@@ -148,7 +146,11 @@ public class JWTVotesEndpoint extends AssignmentEndpoint {
                     votes.values().forEach(vote -> vote.reset());
                     return trackProgress(success().build());
                 }
-            } catch (JwtException e) {
+            }
+            catch (SignatureException e){
+                return trackProgress(failed().feedback("Signature Failed!").output(e.toString()).build());
+            }
+            catch (JwtException e) {
                 return trackProgress(failed().feedback("jwt-invalid-token").output(e.toString()).build());
             }
         }

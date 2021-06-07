@@ -84,7 +84,7 @@ public class JWTFinalEndpoint extends AssignmentEndpoint {
                         }
                         return null;
                     }
-                }).parse(token);
+                }).parseClaimsJws(token);
                 if (errorMessage[0] != null) {
                     return trackProgress(failed().output(errorMessage[0]).build());
                 }
@@ -98,7 +98,11 @@ public class JWTFinalEndpoint extends AssignmentEndpoint {
                 } else {
                     return trackProgress(failed().feedback("jwt-final-not-tom").build());
                 }
-            } catch (JwtException e) {
+            }
+            catch (SignatureException e){
+                return trackProgress(failed().feedback("Signature Failed!").output(e.toString()).build());
+            }
+            catch (JwtException e) {
                 return trackProgress(failed().feedback("jwt-invalid-token").output(e.toString()).build());
             }
         }
