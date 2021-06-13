@@ -54,6 +54,10 @@ public class VulnerableComponentsLesson extends AssignmentEndpoint {
 
 		
         XStream xstream = new XStream(new DomDriver());
+//        Print xstream version to confirm it's updated
+        System.out.println(xstream.getClass().getPackage().getImplementationVersion());
+        XStream.setupDefaultSecurity(xstream);
+        xstream.allowTypes(new Class[]{Contact.class});
         xstream.setClassLoader(Contact.class.getClassLoader());
 
         xstream.processAnnotations(Contact.class);
@@ -93,6 +97,10 @@ public class VulnerableComponentsLesson extends AssignmentEndpoint {
         	}
             return trackProgress(failed().feedback("vulnerable-components.close").build());
        }
+        catch (Exception ex){
+            return trackProgress(failed().feedback("vulnerable-components.close").build());
+//            return trackProgress(failed().feedback(ex.getMessage()).build());
+        }
 
  
 
